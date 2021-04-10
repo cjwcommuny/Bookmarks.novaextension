@@ -19,6 +19,13 @@ exports.activate = function() {
         element.collapsed = false;
     });
     
+    // treeView.onDidChangeVisibility(() => {
+    //     if (!treeView || !dataProvider) {
+    //         return;
+    //     }
+    //     reloadAll(treeView, dataProvider);
+    // });
+    
     treeView.onDidCollapseElement((element) => {
         if (element instanceof BookmarkItem) {
             return
@@ -149,6 +156,7 @@ class FileItem {
 class BookmarkDataProvider implements TreeDataProvider<ItemType> {
     rootItems: FileItem[]
     treeView: TreeView<ItemType> | null = null;
+    fileListenerDisposable: {[path: string]: Disposable} = {};
     
     constructor() {
         this.rootItems = loadBookmarks()
@@ -187,12 +195,16 @@ class BookmarkDataProvider implements TreeDataProvider<ItemType> {
         }
     }
     
-    addBookmark(relativePath: string, lineNumber: number): void {
+    addBookmark(relativePath: string, lineNumber: number, editor: TextEditor): void {
         const fileItems = this.rootItems.filter((fileItem, _) => fileItem.relativePath === relativePath);
         let fileItem: FileItem;
         let newFileItem: boolean;
         if (fileItems.length == 0) {
             fileItem = new FileItem(relativePath);
+            this.fileListenerDisposable[fileItem.relativePath] = editor.onDidStopChanging((editor) => {
+                if (!treeView) { return; }
+                reloadAllBookmarks(treeView, fileItem);
+            });
             this.rootItems.push(fileItem);
             this.rootItems.sort((x, y) => {return (x > y) ? -1 : 1; });
             newFileItem = true;
@@ -216,14 +228,36 @@ class BookmarkDataProvider implements TreeDataProvider<ItemType> {
     
     removeBookmark(item: ItemType): void {
         if (item instanceof FileItem) {
-            this.rootItems = this.rootItems.filter((thisItem) => thisItem.relativePath != item.relativePath);
-            this.treeView?.reload()
+            this.removeFileItem(item);
         } else {
-            const fileItem = item.parent!;
-            fileItem.children = fileItem.children.filter((thisItem) => thisItem.lineNumber != item.lineNumber);
-            this.treeView?.reload(fileItem)
+            this.removeBookmarkItemImpl(item);
         }
         saveBookmarks(this.rootItems);
+    }
+    
+    removeFileItem(item: FileItem): void {
+        this.rootItems = this.rootItems.filter((thisItem) => thisItem.relativePath != item.relativePath);
+        this.fileListenerDisposable[item.relativePath].dispose();
+        this.treeView?.reload()
+    }
+    
+    removeBookmarkItemImpl(item: BookmarkItem): void {
+        const fileItem = item.parent!;
+        fileItem.children = fileItem.children.filter((thisItem) => thisItem.lineNumber != item.lineNumber);if (fileItem.children.length == 0) {
+            this.removeFileItem(fileItem);
+        }
+        if (fileItem.children.length == 0) {
+            this.removeFileItem(fileItem);
+        }
+        this.treeView?.reload(fileItem)
+    }
+    
+    get bookmarksIterable(): BookmarkItem[] {
+        let bookmarks: BookmarkItem[] = [];
+        for (const fileItem of this.rootItems) {
+            bookmarks.push(...fileItem.children);
+        }
+        return bookmarks;
     }
 }
 
@@ -244,7 +278,7 @@ nova.commands.register("addBookmark", (editor: TextEditor) => {
     if (!relativePath) {
         return;
     }
-    dataProvider.addBookmark(relativePath, lineNumber);
+    dataProvider.addBookmark(relativePath, lineNumber, nova.workspace.activeTextEditor);
 });
 
 function getCurrentLine(editor: TextEditor): number {
@@ -323,4 +357,16 @@ function matchStringFromHead(str1: string, str2: string): number {
         }
     }
     return minLength;
+}
+
+function reloadAll(treeView: TreeView<ItemType>, dataProvider: BookmarkDataProvider): void {
+    dataProvider.bookmarksIterable.forEach((bookmark) => {
+        treeView.reload(bookmark);
+    });
+}
+
+function reloadAllBookmarks(treeView: TreeView<ItemType>, fileItem: FileItem): void {
+    fileItem.children.forEach((item) => {
+        treeView.reload(item);
+    });
 }

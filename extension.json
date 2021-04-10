@@ -5,6 +5,8 @@
     "description": "Bookmarks for Nova",
     "version": "1.0",
     "categories": ["sidebars"],
+    "repository": "https://github.com/cjwcommuny/Bookmarks.novaextension",
+    "bugs": "https://github.com/cjwcommuny/Bookmarks.novaextension/issues",
     
     "main": "main.js",
     

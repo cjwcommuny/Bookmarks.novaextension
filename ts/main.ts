@@ -189,12 +189,15 @@ class BookmarkDataProvider implements TreeDataProvider<ItemType> {
     addBookmark(relativePath: string, lineNumber: number): void {
         const fileItems = this.rootItems.filter((fileItem, _) => fileItem.relativePath === relativePath);
         let fileItem: FileItem;
+        let newFileItem: boolean;
         if (fileItems.length == 0) {
             fileItem = new FileItem(relativePath);
             this.rootItems.push(fileItem);
             this.rootItems.sort((x, y) => {return (x > y) ? -1 : 1; });
+            newFileItem = true;
         } else {
             fileItem = fileItems[0];
+            newFileItem = false;
         }
         if (fileItem.children.some((item) => item.lineNumber == lineNumber)) {
             return;
@@ -203,7 +206,11 @@ class BookmarkDataProvider implements TreeDataProvider<ItemType> {
         fileItem.addChild(bookmarkItem);
         fileItem.children.sort((x, y) => (x.lineNumber < y.lineNumber) ? -1 : 1);
         saveBookmarks(this.rootItems);
-        this.treeView?.reload(fileItem);
+        if (newFileItem) {
+            this.treeView?.reload(); // reload the whole tree view
+        } else {
+            this.treeView?.reload(fileItem);
+        }
     }
     
     removeBookmark(item: ItemType): void {

@@ -7,14 +7,10 @@ exports.activate = function() {
     // Do work when the extension is activated
     dataProvider = new BookmarkDataProvider();
     // Create the TreeView
-    treeView = new TreeView("mysidebar", {
+    treeView = new TreeView("bookmarks", {
         dataProvider: dataProvider
     });
     dataProvider.treeView = treeView;
-    
-    treeView.onDidChangeSelection((selection) => {
-        // console.log("New selection: " + selection.map((e) => e.name));
-    });
     
     treeView.onDidExpandElement((element) => {
         if (element instanceof BookmarkItem) {
@@ -31,7 +27,6 @@ exports.activate = function() {
     });
     
     treeView.onDidChangeVisibility(() => {
-        // console.log("Visibility Changed");
     });
     
     // TreeView implements the Disposable interface
@@ -44,13 +39,7 @@ exports.deactivate = function() {
     dataProvider = null;
 }
 
-
-nova.commands.register("mysidebar.add", () => {
-    // Invoked when the "add" header button is clicked
-    console.log("Add");
-});
-
-nova.commands.register("mysidebar.remove", () => {
+nova.commands.register("bookmarks.remove", () => {
     // Invoked when the "remove" header button is clicked
     if (!treeView) {
         return;
@@ -61,7 +50,7 @@ nova.commands.register("mysidebar.remove", () => {
     });
 });
 
-nova.commands.register("mysidebar.doubleClick", () => {
+nova.commands.register("bookmarks.doubleClick", () => {
     // Invoked when an item is double-clicked
     if (!treeView) {
         return;
@@ -71,8 +60,20 @@ nova.commands.register("mysidebar.doubleClick", () => {
         return;
     }
     const absolutePath = nova.path.join(nova.workspace.path!, selection.parent!.relativePath);
-    console.log(`absolutePath: ${absolutePath}`);
     nova.workspace.openFile(absolutePath, {line: selection.lineNumber});
+});
+
+nova.commands.register("bookmarks.showInFinder", (workspace: Workspace) => {
+    if (!treeView) {
+        return;
+    }
+    const workspacePath = nova.workspace.path;
+    if (!workspacePath) {
+        return;
+    }
+    const selection = treeView.selection[0] as FileItem;
+    const path = nova.path.join(workspacePath, selection.relativePath);
+    nova.fs.reveal(path);
 });
 
 type ItemType = FileItem | BookmarkItem;
@@ -180,7 +181,7 @@ class BookmarkDataProvider implements TreeDataProvider<ItemType> {
             return item;
         } else {
             item.image = "__symbol.bookmark";
-            item.command = "mysidebar.doubleClick";
+            item.command = "bookmarks.doubleClick";
             item.contextValue = "bookmark";
             return item;
         }
@@ -222,6 +223,7 @@ class BookmarkDataProvider implements TreeDataProvider<ItemType> {
             fileItem.children = fileItem.children.filter((thisItem) => thisItem.lineNumber != item.lineNumber);
             this.treeView?.reload(fileItem)
         }
+        saveBookmarks(this.rootItems);
     }
 }
 

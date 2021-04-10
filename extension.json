@@ -2,7 +2,7 @@
     "identifier": "cjwcommuny.Bookmarks",
     "name": "Bookmarks",
     "organization": "cjwcommuny",
-    "description": "Lorem ipsum, dolor sit amet.",
+    "description": "Bookmarks for Nova",
     "version": "1.0",
     "categories": ["sidebars"],
     
@@ -24,36 +24,31 @@
     
     "sidebars": [
         {
-            "id": "mysidebar",
+            "id": "bookmarks",
             "name": "Bookmarks",
             "smallImage": "sidebar-bookmarks",
             "smallSelectedImage": "sidebar-bookmarks-selected",
             "largeImage": "sidebar-bookmarks-large",
             "sections": [
                 {
-                    "id": "mysidebar",
+                    "id": "bookmarks",
                     "name": "Bookmarks",
                     "allowMultiple": true,
-                    "placeholderText": "No profiles have been created.",
-                    "placeholderImage": "mysidebar-placeholder",
+                    "placeholderText": "No bookmarks have been created.",
+                    "placeholderImage": "sidebar-bookmarks-large",
                     "headerCommands": [
                         {
                             "title": "Remove",
                             "image": "__builtin.remove",
                             "tooltip": "Remove the selected profiles",
-                            "command": "mysidebar.remove",
-                            "when": "viewItem == 'bookmark'"
+                            "command": "bookmarks.remove",
+                            "when": "viewItem != null"
                         }
                     ],
                     "contextCommands": [
                         {
                             "title": "Remove",
-                            "command": "mysidebar.remove",
-                            "when": "viewItem != null"
-                        },
-                        {
-                            "title": "Show in Finder",
-                            "command": "mysidebar.showInFinder",
+                            "command": "bookmarks.remove",
                             "when": "viewItem != null"
                         }
                     ]

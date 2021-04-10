@@ -1,0 +1,17 @@
+{
+  "devDependencies": {
+    "@types/nova-editor": "^1.0.0",
+    "@typescript-eslint/eslint-plugin": "^4.21.0",
+    "@typescript-eslint/parser": "^4.21.0",
+    "eslint": "^7.23.0",
+    "typescript": "^4.2.4"
+  },
+  "scripts": {
+    "clean": "rm -rf build",
+    "build": "npm run tsc",
+    "tsc": "tsc"
+  },
+  "dependencies": {
+    "@types/nova-editor-node": "github:cjwcommuny/nova-editor-node"
+  }
+}

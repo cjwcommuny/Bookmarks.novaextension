@@ -1,0 +1,64 @@
+{
+    "identifier": "cjwcommuny.Bookmarks",
+    "name": "Bookmarks",
+    "organization": "cjwcommuny",
+    "description": "Lorem ipsum, dolor sit amet.",
+    "version": "1.0",
+    "categories": ["sidebars"],
+    
+    "main": "main.js",
+    
+    "commands": {
+        "editor": [
+            {
+                "title": "Add Bookmark",
+                "command": "addBookmark",
+                "shortcut": "f1",
+                "when": "editorHasFocus"
+            }
+        ]
+    },
+    "entitlements": {
+        "filesystem": "readwrite"
+    },
+    
+    "sidebars": [
+        {
+            "id": "mysidebar",
+            "name": "Bookmarks",
+            "smallImage": "sidebar-bookmarks",
+            "smallSelectedImage": "sidebar-bookmarks-selected",
+            "largeImage": "sidebar-bookmarks-large",
+            "sections": [
+                {
+                    "id": "mysidebar",
+                    "name": "Bookmarks",
+                    "allowMultiple": true,
+                    "placeholderText": "No profiles have been created.",
+                    "placeholderImage": "mysidebar-placeholder",
+                    "headerCommands": [
+                        {
+                            "title": "Remove",
+                            "image": "__builtin.remove",
+                            "tooltip": "Remove the selected profiles",
+                            "command": "mysidebar.remove",
+                            "when": "viewItem == 'bookmark'"
+                        }
+                    ],
+                    "contextCommands": [
+                        {
+                            "title": "Remove",
+                            "command": "mysidebar.remove",
+                            "when": "viewItem != null"
+                        },
+                        {
+                            "title": "Show in Finder",
+                            "command": "mysidebar.showInFinder",
+                            "when": "viewItem != null"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

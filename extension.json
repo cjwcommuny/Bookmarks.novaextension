@@ -42,9 +42,15 @@
                         {
                             "title": "Remove",
                             "image": "__builtin.remove",
-                            "tooltip": "Remove the selected profiles",
+                            "tooltip": "Remove the selected bookmarks",
                             "command": "bookmarks.remove",
                             "when": "viewItem != null"
+                        },
+                        {
+                            "title": "Refresh",
+                            "image": "__builtin.refresh",
+                            "tooltip": "Remove the selected profiles",
+                            "command": "bookmarks.refresh"
                         }
                     ],
                     "contextCommands": [

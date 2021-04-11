@@ -13,8 +13,7 @@ Still in development...
 
 ## Known Issues
 
-- Only support workspace.
-- When a file with bookmarks is modified, the bookmark will not adjust its position and content.
+- When a file with bookmarks is modified, the bookmark will not adjust its position.
 
 ## TODO
 
